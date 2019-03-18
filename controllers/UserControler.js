@@ -11,14 +11,37 @@ class UserController{
         this.formEl.addEventListener("submit", e=>{
             e.preventDefault();
             let user = this.getValues();
-            this.addLine(user);
-
+            this.getPhoto((content)=>{
+                user.photo = content;
+                this.addLine(user);
+            });
+             
         });
     }
+    // pega o elmento de foto;
+    getPhoto(callback){
+        let fileReader = new FileReader();
+        
+        let elements = [...this.formEl.elements].filter( element=>{
+
+            if(element.name === 'photo')  
+                return element;
+
+        });
+
+        let photoFile = elements[0].files[0];
+        console.log("a foto >",photoFile);
+        fileReader.onload = ()=>{
+            callback(fileReader.result); 
+        }
+        fileReader.readAsDataURL(photoFile);
+    }
+
     // recupera os valores dos campos do form
     getValues(){
         let user = {};
-        Array.from(this.formEl.elements).forEach( function(field, index){
+        // poderia ser feito com Array.from
+        [...this.formEl.elements].forEach( function(field, index){
             if(field.name == 'gender'){
                 if(field.checked){
                     user[field.name] = field.value;
@@ -40,10 +63,9 @@ class UserController{
     }
     // adciona uma nova linha com o usuario que acabou de ser adcionado
     addLine(dataUser){
-        console.log(dataUser);
         this.tableUserId.innerHTML += `<tr>
             <td>
-                <img src="dist/img/user1-128x128.jpg" alt="User Image" class="img-circle img-sm">
+                <img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm">
             </td>
                 <td>${dataUser.name}</td>
                 <td>${dataUser.email}</td>

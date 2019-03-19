@@ -7,34 +7,57 @@ class UserController{
     }
     // adciona evento de submit ao form
     onSubmit(){
-    
+        
+        
         this.formEl.addEventListener("submit", e=>{
+            console.log(this.formEl);
             e.preventDefault();
+            let btn_submit = this.formEl.querySelector('[type=submit]');
+            btn_submit.disable = true;
             let user = this.getValues();
-            this.getPhoto((content)=>{
-                user.photo = content;
-                this.addLine(user);
-            });
+            this.getPhoto().then(
+                (file)=>{
+                    user.photo = file;
+                    this.addLine(user);
+                    btn_submit.disable = false;
+                },
+                (e)=>{
+                    console.error(e);
+                }
+            );
              
         });
     }
-    // pega o elmento de foto;
-    getPhoto(callback){
-        let fileReader = new FileReader();
-        
-        let elements = [...this.formEl.elements].filter( element=>{
+    // pega o arquivo de foto que foi enviado e coloca o retorna!
+    getPhoto(){
+        return new Promise((resolve,reject)=>{
+            let fileReader = new FileReader();
+            
+            let elements = [...this.formEl.elements].filter( element=>{
 
-            if(element.name === 'photo')  
-                return element;
+                if(element.name === 'photo')  
+                    return element;
 
+            });
+
+            let photoFile = elements[0].files[0];
+            fileReader.onload = ()=>{
+                console.log('resolve');
+                resolve(fileReader.result); 
+
+            }
+            fileReader.onerror = (e)=>{
+                reject(e);
+            }
+            if(photoFile){
+                fileReader.readAsDataURL(photoFile);
+            }else{
+                resolve("dist/img/boxed-bg.jpg");
+            }
+                        
+            
         });
-
-        let photoFile = elements[0].files[0];
-        console.log("a foto >",photoFile);
-        fileReader.onload = ()=>{
-            callback(fileReader.result); 
-        }
-        fileReader.readAsDataURL(photoFile);
+        
     }
 
     // recupera os valores dos campos do form
@@ -46,7 +69,10 @@ class UserController{
                 if(field.checked){
                     user[field.name] = field.value;
                 }
-            }else{
+            }else if(field.name == 'admin'){
+                user[field.name] = field.checked;
+            }
+            else{
                 user[field.name] = field.value;
             }   
         });
@@ -69,7 +95,7 @@ class UserController{
             </td>
                 <td>${dataUser.name}</td>
                 <td>${dataUser.email}</td>
-                <td>${dataUser.admin}</td>
+                <td>${dataUser.admin ? "Sim":"Não"}</td>
                 <td>${dataUser.birth}</td>
                 <td>
                 <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>

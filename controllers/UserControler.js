@@ -7,10 +7,7 @@ class UserController{
     }
     // adciona evento de submit ao form
     onSubmit(){
-        
-        
         this.formEl.addEventListener("submit", e=>{
-            console.log(this.formEl);
             e.preventDefault();
             let btn_submit = this.formEl.querySelector('[type=submit]');
             btn_submit.disable = true;
@@ -19,6 +16,7 @@ class UserController{
                 (file)=>{
                     user.photo = file;
                     this.addLine(user);
+                    this.formEl.reset();
                     btn_submit.disable = false;
                 },
                 (e)=>{
@@ -42,7 +40,6 @@ class UserController{
 
             let photoFile = elements[0].files[0];
             fileReader.onload = ()=>{
-                console.log('resolve');
                 resolve(fileReader.result); 
 
             }
@@ -63,8 +60,15 @@ class UserController{
     // recupera os valores dos campos do form
     getValues(){
         let user = {};
+        let isValid = true;
         // poderia ser feito com Array.from
         [...this.formEl.elements].forEach( function(field, index){
+
+            if(['name','email','password'].indexOf(field.name)>-1 && !field.value){
+                field.parentElement.classList.add('has-error');
+                isValid = false;
+            }
+
             if(field.name == 'gender'){
                 if(field.checked){
                     user[field.name] = field.value;
@@ -76,6 +80,11 @@ class UserController{
                 user[field.name] = field.value;
             }   
         });
+
+        // evita enviar o formulario nao valido
+        if(!isValid){
+            return false;
+        }
         return new User(
             user.name,
             user.gender,
@@ -89,19 +98,31 @@ class UserController{
     }
     // adciona uma nova linha com o usuario que acabou de ser adcionado
     addLine(dataUser){
-        this.tableUserId.innerHTML += `<tr>
-            <td>
+        let tr  = document.createElement('tr');
+        tr.dataset.user = JSON.stringify(dataUser);
+        tr.innerHTML = ` <td>
                 <img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm">
             </td>
                 <td>${dataUser.name}</td>
                 <td>${dataUser.email}</td>
                 <td>${dataUser.admin ? "Sim":"Não"}</td>
-                <td>${dataUser.birth}</td>
+                <td>${Utils.dateFormat(dataUser.register)}</td>
                 <td>
                 <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
                 <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
-            </td>
-      </tr>`
-      
+            </td>`
+        this.tableUserId.appendChild(tr);
+        this.updateCount();
+    }
+    updateCount(){
+        let numberUser = 0;
+        let numberAdmin = 0;
+        [...this.tableUserId.children].forEach(tr=>{
+            numberUser++;
+            let user = JSON.parse(tr.dataset.user);
+            if(user._admin) numberAdmin++;
+        });
+        document.querySelector("#number-users").innerHTML = numberUser;
+        document.querySelector("#number-users-admin").innerHTML = numberAdmin;
     }
 }

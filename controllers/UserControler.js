@@ -1,9 +1,10 @@
 class UserController{
-    constructor(formId,tableUserId){
+    constructor(formId,formUpdateId,tableUserId){
         this.formEl = document.getElementById(formId);
         this.tableUserId = document.getElementById(tableUserId);
-
+        this.formUpdateEl  = document.getElementById(formUpdateId);
         this.onSubmit();
+        this.onEditCancel();
     }
     // adciona evento de submit ao form
     onSubmit(){
@@ -18,12 +19,20 @@ class UserController{
                     this.addLine(user);
                     this.formEl.reset();
                     btn_submit.disable = false;
+                    document.querySelectorAll('.form-group').forEach(element =>{
+                        element.classList = ['form-group'];
+                    })
                 },
                 (e)=>{
                     console.error(e);
                 }
             );
              
+        });
+    }
+    onEditCancel(){
+        document.querySelector("#box-user-update .btn-cancel").addEventListener('click',e=>{
+            this.showPanelCreate();
         });
     }
     // pega o arquivo de foto que foi enviado e coloca o retorna!
@@ -100,7 +109,8 @@ class UserController{
     addLine(dataUser){
         let tr  = document.createElement('tr');
         tr.dataset.user = JSON.stringify(dataUser);
-        tr.innerHTML = ` <td>
+        tr.innerHTML = 
+        `   <td>
                 <img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm">
             </td>
                 <td>${dataUser.name}</td>
@@ -108,11 +118,19 @@ class UserController{
                 <td>${dataUser.admin ? "Sim":"Não"}</td>
                 <td>${Utils.dateFormat(dataUser.register)}</td>
                 <td>
-                <button type="button" class="btn btn-primary btn-xs btn-flat">Editar</button>
+                <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
                 <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
             </td>`
+        
+        tr.querySelector(".btn-edit").addEventListener('click',e=>{
+            this.showPanelUpdate();
+
+        });
         this.tableUserId.appendChild(tr);
         this.updateCount();
+        //this.formEl.reset();
+
+    
     }
     updateCount(){
         let numberUser = 0;
@@ -124,5 +142,15 @@ class UserController{
         });
         document.querySelector("#number-users").innerHTML = numberUser;
         document.querySelector("#number-users-admin").innerHTML = numberAdmin;
+    }
+    showPanelUpdate()
+    {
+        document.getElementById('box-user-create').style.display = 'none';
+        document.getElementById('box-user-update').style.display = 'block';
+    }
+    showPanelCreate()
+    {
+        document.getElementById('box-user-create').style.display = 'block';
+        document.getElementById('box-user-update').style.display = 'none';
     }
 }

@@ -30,6 +30,7 @@ class UserController{
              
         });
     }
+    // evento de cancelamento de edição
     onEditCancel(){
         document.querySelector("#box-user-update .btn-cancel").addEventListener('click',e=>{
             this.showPanelCreate();
@@ -124,7 +125,27 @@ class UserController{
         
         tr.querySelector(".btn-edit").addEventListener('click',e=>{
             this.showPanelUpdate();
+            let json = JSON.parse(tr.dataset.user);
+            let form = document.querySelector("#form-user-update");
+            for(name in json){
+                let field = form.querySelector('[name= '+name.replace("_","")+']');
 
+                if(field){
+                    switch(field){
+                        case 'file':
+                            continue;
+                        case 'radio':
+                            field = form.querySelector('[name= '+name.replace("_","")+'][value='+json[name]+']');
+                            field.checked = true;
+                            break;
+                        case 'checkbox':
+                            field.checked = json[name];
+                            break;
+                        default:
+                            field.value = json[name];
+                    }
+                }
+            }
         });
         this.tableUserId.appendChild(tr);
         this.updateCount();

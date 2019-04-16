@@ -4,7 +4,7 @@ class UserController{
         this.tableUserId = document.getElementById(tableUserId);
         this.formUpdateEl  = document.getElementById(formUpdateId);
         this.onSubmit();
-        this.onEditCancel();
+        this.onEdit();
     }
     // adciona evento de submit ao form
     onSubmit(){
@@ -12,7 +12,7 @@ class UserController{
             e.preventDefault();
             let btn_submit = this.formEl.querySelector('[type=submit]');
             btn_submit.disable = true;
-            let user = this.getValues();
+            let user = this.getValues(this.formEl);
             this.getPhoto().then(
                 (file)=>{
                     user.photo = file;
@@ -31,9 +31,34 @@ class UserController{
         });
     }
     // evento de cancelamento de edição
-    onEditCancel(){
+    onEdit(){
         document.querySelector("#box-user-update .btn-cancel").addEventListener('click',e=>{
             this.showPanelCreate();
+        });
+        this.formUpdateEl.addEventListener('submit',e=>{
+            
+            e.preventDefault();
+            let btn = this.formUpdateEl.querySelector('[type=submit]');
+            btn.disable = true;
+            let values = this.getValues(this.formUpdateEl);
+            let index = this.formUpdateEl.dataset.trIndex;
+            let tr = this.tableUserId.rows[index];
+            
+            let oldUser = JSON.parse(tr.dataset.user);
+            
+            let result = Object.assign({},oldUser, values);
+            
+            if(!values.photo) result._photo = oldUser._photo;
+            console.log(result._photo);
+            
+            tr.dataset.user = JSON.stringify(result);
+            this.insertHTML(tr, values);
+            this.addEventsTr(tr);
+            this.updateCount();
+            this.formUpdateEl.reset();
+            btn.disable = false;
+            this.showPanelCreate();
+        
         });
     }
     // pega o arquivo de foto que foi enviado e coloca o retorna!
@@ -60,19 +85,17 @@ class UserController{
                 fileReader.readAsDataURL(photoFile);
             }else{
                 resolve("dist/img/boxed-bg.jpg");
-            }
-                        
-            
-        });
-        
+            } 
+        });   
     }
 
+
     // recupera os valores dos campos do form
-    getValues(){
+    getValues(formEl){
         let user = {};
         let isValid = true;
         // poderia ser feito com Array.from
-        [...this.formEl.elements].forEach( function(field, index){
+        [...formEl.elements].forEach( function(field, index){
 
             if(['name','email','password'].indexOf(field.name)>-1 && !field.value){
                 field.parentElement.classList.add('has-error');
@@ -106,12 +129,11 @@ class UserController{
             user.admin
         );
     }
-    // adciona uma nova linha com o usuario que acabou de ser adcionado
-    addLine(dataUser){
-        let tr  = document.createElement('tr');
-        tr.dataset.user = JSON.stringify(dataUser);
-        tr.innerHTML = 
-        `   <td>
+    insertHTML(contentTr , dataUser){
+        console.log(dataUser);
+
+        contentTr.innerHTML = 
+        `<td>
                 <img src="${dataUser.photo}" alt="User Image" class="img-circle img-sm">
             </td>
                 <td>${dataUser.name}</td>
@@ -121,21 +143,22 @@ class UserController{
                 <td>
                 <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
                 <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
-            </td>`
-        
+            </td>`;
+    }
+    addEventsTr(tr){
         tr.querySelector(".btn-edit").addEventListener('click',e=>{
             this.showPanelUpdate();
             let json = JSON.parse(tr.dataset.user);
-            let form = document.querySelector("#form-user-update");
-            for(name in json){
-                let field = form.querySelector('[name= '+name.replace("_","")+']');
 
+            this.formUpdateEl.dataset.trIndex = tr.sectionRowIndex;
+            for(name in json){
+                let field = this.formUpdateEl.querySelector('[name= '+name.replace("_","")+']');
                 if(field){
                     switch(field){
                         case 'file':
                             continue;
                         case 'radio':
-                            field = form.querySelector('[name= '+name.replace("_","")+'][value='+json[name]+']');
+                            field = this.formUpdateEl.querySelector('[name= '+name.replace("_","")+'][value='+json[name]+']');
                             field.checked = true;
                             break;
                         case 'checkbox':
@@ -145,13 +168,19 @@ class UserController{
                             field.value = json[name];
                     }
                 }
+                this.formUpdateEl.querySelector('.photo').src = json._photo;
             }
         });
+    }
+    // adciona uma nova linha com o usuario que acabou de ser adcionado
+    addLine(dataUser){
+        let tr  = document.createElement('tr');
+        tr.dataset.user = JSON.stringify(dataUser);
+        this.insertHTML(tr, dataUser) ;
+        this.addEventsTr(tr ); 
         this.tableUserId.appendChild(tr);
         this.updateCount();
-        //this.formEl.reset();
-
-    
+        
     }
     updateCount(){
         let numberUser = 0;

@@ -8,6 +8,7 @@ class UserController {
     }
     // adciona evento de submit ao form
     onSubmit() {
+        // adciona o evento de submi ao formulario de inscrição
         this.formEl.addEventListener("submit", e => {
             e.preventDefault();
             let btn_submit = this.formEl.querySelector('[type=submit]');
@@ -19,6 +20,7 @@ class UserController {
                     this.addLine(user);
                     this.formEl.reset();
                     btn_submit.disable = false;
+                    // remover as classes de erro
                     document.querySelectorAll('.form-group').forEach(element => {
                         element.classList = ['form-group'];
                     })
@@ -30,42 +32,49 @@ class UserController {
 
         });
     }
-    // evento de cancelamento de edição
+    // eventos de edição
     onEdit() {
+
+        // cancelamento de edicao
         document.querySelector("#box-user-update .btn-cancel").addEventListener('click', e => {
             this.showPanelCreate();
         });
+        // salvar edicao
         this.formUpdateEl.addEventListener('submit', e => {
 
             e.preventDefault();
+
             let btn = this.formUpdateEl.querySelector('[type=submit]');
+
             btn.disable = true;
+
             let values = this.getValues(this.formUpdateEl);
+
             let index = this.formUpdateEl.dataset.trIndex;
+
             let tr = this.tableUserId.rows[index];
+
             let oldUser = JSON.parse(tr.dataset.user);
 
-            let result = Object.assign({}, oldUser,values );
-            
-        
+            let result = Object.assign({}, oldUser, values);
             this.getPhoto(this.formUpdateEl).then(
                 (file) => {
 
-                    if (!values._photo) {
-                        //  console.log('values photo -> falso')
-                        result._photo = oldUser._photo;
-                    }else{
-                        result._photo = file;
-                    }
-                    
-                    
+                    result._photo = file;
                     tr.dataset.user = JSON.stringify(result);
+
                     result._register = new Date(result._register);
+
                     this.insertHTML(tr, result);
+
                     this.addEventsTr(tr);
+
                     this.updateCount();
+
                     this.formUpdateEl.reset();
+
                     btn.disable = false;
+
                     this.showPanelCreate();
 
                 },
@@ -144,10 +153,10 @@ class UserController {
             user.admin
         );
     }
+
+    // insere o datauser no html
     insertHTML(contentTr, dataUser) {
-        console.log(dataUser);
-        console.log(dataUser._register);
-        console.log(typeof(dataUser._register));
+
         contentTr.innerHTML =
             `<td>
                 <img src="${dataUser._photo}" alt="User Image" class="img-circle img-sm">
@@ -191,6 +200,8 @@ class UserController {
             }
         });
     }
+
+
     // adciona uma nova linha com o usuario que acabou de ser adcionado
     addLine(dataUser) {
         let tr = document.createElement('tr');
@@ -199,9 +210,10 @@ class UserController {
         this.addEventsTr(tr);
         this.tableUserId.appendChild(tr);
         this.updateCount();
-
     }
+
     updateCount() {
+
         let numberUser = 0;
         let numberAdmin = 0;
         [...this.tableUserId.children].forEach(tr => {
@@ -212,10 +224,12 @@ class UserController {
         document.querySelector("#number-users").innerHTML = numberUser;
         document.querySelector("#number-users-admin").innerHTML = numberAdmin;
     }
+
     showPanelUpdate() {
         document.getElementById('box-user-create').style.display = 'none';
         document.getElementById('box-user-update').style.display = 'block';
     }
+
     showPanelCreate() {
         document.getElementById('box-user-create').style.display = 'block';
         document.getElementById('box-user-update').style.display = 'none';

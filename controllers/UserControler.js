@@ -17,6 +17,7 @@ class UserController {
             this.getPhoto(this.formEl).then(
                 (file) => {
                     user.photo = file;
+                    this.insertSession(user);
                     this.addLine(user);
                     this.formEl.reset();
                     btn_submit.disable = false;
@@ -85,6 +86,7 @@ class UserController {
 
         });
     }
+
     // pega o arquivo de foto que foi enviado e coloca o retorna!
     getPhoto(formEl) {
         return new Promise((resolve, reject) => {
@@ -161,13 +163,13 @@ class UserController {
             `<td>
                 <img src="${dataUser._photo}" alt="User Image" class="img-circle img-sm">
             </td>
-                <td>${dataUser._name}</td>
+                <td class="name-user">${dataUser._name}</td>
                 <td>${dataUser._email}</td>
                 <td>${dataUser._admin ? "Sim" : "Não"}</td>
                 <td>${Utils.dateFormat(dataUser._register)}</td>
                 <td>
                 <button type="button" class="btn btn-primary btn-edit btn-xs btn-flat">Editar</button>
-                <button type="button" class="btn btn-danger btn-xs btn-flat">Excluir</button>
+                <button type="button" class="btn btn-danger btn-xs btn-flat btn-delete">Excluir</button>
             </td>`;
         //console.log(contentTr);
     }
@@ -199,8 +201,34 @@ class UserController {
                 this.formUpdateEl.querySelector('.photo').src = json._photo;
             }
         });
+        tr.querySelector('.btn-delete').addEventListener('click',e=>{
+            e.preventDefault();
+            let name = tr.querySelector(".name-user").innerHTML;
+            if(confirm(`Deseja excluir o registro de ${name}  ?`)){
+                tr.remove();
+                this.updateCount();
+            }
+        });
     }
+    getUsersStorage(){
+        let users = [];
+        if(sessionStorage.getItem('users')){
+            user  = JSON.parse(sessionStorage.getItem('users'));
+        }
+        return users;
+    }
+    recoveryUsers(){
+        let users = this.getUsersStorage();
+        forEach(user=>{
 
+            this.addLine(user);
+        });
+    }
+    insertSession(user){
+        let users = this.getUsersStorage();
+        users.push(user);
+        sessionStorage.setItem('users', JSON.stringify(users));
+    }
 
     // adciona uma nova linha com o usuario que acabou de ser adcionado
     addLine(dataUser) {

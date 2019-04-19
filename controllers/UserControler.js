@@ -5,6 +5,8 @@ class UserController {
         this.formUpdateEl = document.getElementById(formUpdateId);
         this.onSubmit();
         this.onEdit();
+        this.recoveryUsers();
+
     }
     // adciona evento de submit ao form
     onSubmit() {
@@ -158,7 +160,6 @@ class UserController {
 
     // insere o datauser no html
     insertHTML(contentTr, dataUser) {
-
         contentTr.innerHTML =
             `<td>
                 <img src="${dataUser._photo}" alt="User Image" class="img-circle img-sm">
@@ -201,30 +202,33 @@ class UserController {
                 this.formUpdateEl.querySelector('.photo').src = json._photo;
             }
         });
-        tr.querySelector('.btn-delete').addEventListener('click',e=>{
+        tr.querySelector('.btn-delete').addEventListener('click', e => {
             e.preventDefault();
             let name = tr.querySelector(".name-user").innerHTML;
-            if(confirm(`Deseja excluir o registro de ${name}  ?`)){
+            if (confirm(`Deseja excluir o registro de ${name}  ?`)) {
                 tr.remove();
                 this.updateCount();
             }
         });
     }
-    getUsersStorage(){
+    // pegar os usuários que estão na nossa sessionStorage
+    getUsersStorage() {
         let users = [];
-        if(sessionStorage.getItem('users')){
-            user  = JSON.parse(sessionStorage.getItem('users'));
+        if (sessionStorage.getItem('users')) {
+            users = JSON.parse(sessionStorage.getItem('users'));
         }
         return users;
     }
-    recoveryUsers(){
+    // colocar na nossa tabela, os valores da nossa SessionStorage
+    recoveryUsers() {
         let users = this.getUsersStorage();
-        forEach(user=>{
-
+        users.forEach(user => {
+            user._register = new Date(user._register);
             this.addLine(user);
         });
     }
-    insertSession(user){
+    // insere um novo usuário na nossa sessionStorage
+    insertSession(user) {
         let users = this.getUsersStorage();
         users.push(user);
         sessionStorage.setItem('users', JSON.stringify(users));

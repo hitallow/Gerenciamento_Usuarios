@@ -214,8 +214,9 @@ class UserController {
     // pegar os usuários que estão na nossa sessionStorage
     getUsersStorage() {
         let users = [];
-        if (sessionStorage.getItem('users')) {
-            users = JSON.parse(sessionStorage.getItem('users'));
+        if (localStorage.getItem('users')) {
+            //users = JSON.parse(sessionStorage.getItem('users'));
+            users = JSON.parse(localStorage.getItem('users'));
         }
         return users;
     }
@@ -231,8 +232,12 @@ class UserController {
     insertSession(user) {
         let users = this.getUsersStorage();
         users.push(user);
-        sessionStorage.setItem('users', JSON.stringify(users));
+        //sessionStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('users', JSON.stringify(users));
     }
+
+
+    
 
     // adciona uma nova linha com o usuario que acabou de ser adcionado
     addLine(dataUser) {

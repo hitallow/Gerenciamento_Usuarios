@@ -19,7 +19,8 @@ class UserController {
             this.getPhoto(this.formEl).then(
                 (file) => {
                     user.photo = file;
-                    this.insertSession(user);
+                    //.insertSession(user);
+                    user.save();
                     this.addLine(user);
                     this.formEl.reset();
                     btn_submit.disable = false;
@@ -60,14 +61,22 @@ class UserController {
             let oldUser = JSON.parse(tr.dataset.user);
 
             let result = Object.assign({}, oldUser, values);
+            
             this.getPhoto(this.formUpdateEl).then(
+            
                 (file) => {
 
                     result._photo = file;
+
                     tr.dataset.user = JSON.stringify(result);
 
-                    result._register = new Date(result._register);
-
+                    //result._register = new Date(result._register);
+                    user = new User();
+                    
+                    user.loadFromJSON(result);
+                    
+                    user.save();
+                    
                     this.insertHTML(tr, result);
 
                     this.addEventsTr(tr);

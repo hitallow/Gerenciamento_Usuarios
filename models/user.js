@@ -1,5 +1,5 @@
-class User{
-    constructor(name, gender,birth, country, email, password, photo, admin){
+class User {
+    constructor(name, gender, birth, country, email, password, photo, admin) {
         this._name = name;
         this._gender = gender;
         this._birth = birth;
@@ -8,61 +8,102 @@ class User{
         this._password = password;
         this._photo = photo;
         this._admin = admin;
-        this._register = new Date();
-    }
 
-    get name(){
+        this._register = new Date();
+        this._id = 0;
+    }
+    static getUsersStorage() {
+        let users = [];
+        if (localStorage.getItem('users')) {
+            //users = JSON.parse(sessionStorage.getItem('users'));
+            users = JSON.parse(localStorage.getItem('users'));
+        }
+        return users;
+    }
+    getNewID() {
+        if (!window.id) {
+            window.id = 0;
+        }
+        id++;
+        return id;
+    }
+    save() {
+        let users = User.getUsersStorage();
+
+        if (this._id > 0) {
+            users.map(u => {
+                if (u._id === this._id) {
+                    u = this;
+                }
+            });
+        } else {
+            this._id = this.getNewID();
+            users.push(this);
+        }
+        localStorage.setItem("users", JSON.stringify(users));
+    }
+    loadFromJSON(json) {
+        console.log(json);
+        for (let name in json) {
+            if (name == '_register') {
+                this._register = Date(json[name]);
+            } else {
+                this.name = json[name];
+            }
+        }
+    }
+    get name() {
         return this._name;
     }
-    set name(newName){
+    set name(newName) {
         this._name = newName;
     }
-    get gender(){
+    get gender() {
         return this._gender;
     }
-    set gender(newGender){
+    set gender(newGender) {
         this._gender = newGender;
     }
-    get birth(){
+    get birth() {
         return this._birth;
     }
-    set birth(newBirth){
+    set birth(newBirth) {
         this._birth = newBirth;
     }
-    get country (){
+    get country() {
         return this._country;
     }
-    set country(newCountry){
+    set country(newCountry) {
         this._country = newCountry;
     }
-    get email(){
+    get email() {
         return this._email;
     }
-    set email(newEmail){
+    set email(newEmail) {
         this._email = newEmail;
     }
-    get password(){
+    get password() {
         return this._password;
     }
-    set password(newPassword){
+    set password(newPassword) {
         this._password = newPassword;
     }
-    get photo(){
+    get photo() {
         return this._photo;
     }
-    set photo(newPhoto){
+    set photo(newPhoto) {
         this._photo = newPhoto;
     }
-    get admin(){
+    get admin() {
         return this._admin;
     }
-    set admin(newAdmin){
+    set admin(newAdmin) {
         this._admin = newAdmin;
     }
-    get register(){
+    get register() {
         return this._register;
     }
-    set register(newRegister){
+    set register(newRegister) {
         this._register = newRegister;
     }
 }

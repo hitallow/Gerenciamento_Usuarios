@@ -216,6 +216,9 @@ class UserController {
             e.preventDefault();
             let name = tr.querySelector(".name-user").innerHTML;
             if (confirm(`Deseja excluir o registro de ${name}  ?`)) {
+                let user = new User();
+                user.loadFromJSON(JSON.parse(tr.dataset.user));
+                user.exclude();
                 tr.remove();
                 this.updateCount();
             }

@@ -62,6 +62,17 @@ class User {
         }
         
     }
+    exclude(){
+        let users = User.getUsersStorage();
+        users.forEach((u, index) => {
+            if(u._id == this.id){
+            
+                users.splice(index,1);
+            }
+            
+        });
+        localStorage.setItem("users", users);
+    }
     get name() {
         return this._name;
     }

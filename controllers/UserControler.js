@@ -19,7 +19,7 @@ class UserController {
             this.getPhoto(this.formEl).then(
                 (file) => {
                     user.photo = file;
-                    //.insertSession(user);
+                    // user sabe, se salvar no localStorage
                     user.save();
                     this.addLine(user);
                     this.formEl.reset();
@@ -71,7 +71,8 @@ class UserController {
                     tr.dataset.user = JSON.stringify(result);
 
                     //result._register = new Date(result._register);
-                    user = new User();
+
+                    let user = new User();
                     
                     user.loadFromJSON(result);
                     
@@ -232,8 +233,10 @@ class UserController {
     // colocar na nossa tabela, os valores da nossa SessionStorage
     recoveryUsers() {
         let users = this.getUsersStorage();
-        users.forEach(user => {
-            user._register = new Date(user._register);
+        users.forEach(dataUser => {
+            let user = new User();
+            user.loadFromJSON(dataUser);
+            //user._register = new Date(user._register);
             this.addLine(user);
         });
     }

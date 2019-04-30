@@ -10,7 +10,7 @@ class User {
         this._admin = admin;
 
         this._register = new Date();
-        this._id = 0;
+        this._id ;
     }
     static getUsersStorage() {
         let users = [];
@@ -29,28 +29,38 @@ class User {
     }
     save() {
         let users = User.getUsersStorage();
-
-        if (this._id > 0) {
+        
+        // caso o entre no if, o dado está sendo alterado
+        if (this.id > 0) {
             users.map(u => {
-                if (u._id === this._id) {
-                    u = this;
+                console.log(u);
+                if (u._id == this.id) {
+                    Object.assign(u, this);
+        
                 }
+                return u;
             });
-        } else {
-            this._id = this.getNewID();
+            
+        } 
+        // caso de entrar no else, significa que o dado está sendo salvo pela primeira 
+        else {
+            this.id = this.getNewID();
             users.push(this);
         }
         localStorage.setItem("users", JSON.stringify(users));
     }
     loadFromJSON(json) {
-        console.log(json);
+    
         for (let name in json) {
+                        
             if (name == '_register') {
-                this._register = Date(json[name]);
+                this.register = new Date(json[name]);
+                continue;
             } else {
-                this.name = json[name];
+                this[name.replace('_','')] = json[name];
             }
         }
+        
     }
     get name() {
         return this._name;
@@ -105,5 +115,11 @@ class User {
     }
     set register(newRegister) {
         this._register = newRegister;
+    }
+    get id(){
+        return this._id;
+    }
+    set id(value){
+        this._id = value;
     }
 }

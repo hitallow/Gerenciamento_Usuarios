@@ -21,10 +21,14 @@ class User {
         return users;
     }
     getNewID() {
-        if (!window.id) {
-            window.id = 0;
+        let id = parseInt(localStorage.getItem('usersId'));
+        console.log(id);
+        if ( !id ) {
+            console.log("entrei no if");
+            id = 0;
         }
         id++;
+        localStorage.setItem('usersId', id);
         return id;
     }
     save() {

@@ -245,7 +245,7 @@ class UserController {
     }
     // insere um novo usuário na nossa sessionStorage
     insertSession(user) {
-        let users = this.getUsersStorage();
+        let users = User.getUsersStorage();
         users.push(user);
         //sessionStorage.setItem('users', JSON.stringify(users));
         localStorage.setItem('users', JSON.stringify(users));

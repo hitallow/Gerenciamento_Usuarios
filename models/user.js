@@ -17,6 +17,7 @@ class User {
         if (localStorage.getItem('users')) {
             //users = JSON.parse(sessionStorage.getItem('users'));
             users = JSON.parse(localStorage.getItem('users'));
+            console.log(typeof(JSON.parse(localStorage.getItem('users'))));
         }
         return users;
     }
